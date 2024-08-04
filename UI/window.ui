@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1562</width>
+    <height>1261</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="illuminant_label">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>90</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Illuminant</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="illuminant_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D50</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D55</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D65</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D75</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>illuminant A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>illuminant B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>illuminant C</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Fluorescent</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Tungsten</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="scene_label">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>90</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Scene</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="optics_label">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>90</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Optics</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Runsimulation_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>1170</y>
+      <width>1481</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Run Simulation</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sensor_label">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>90</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Sensor</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="isp_label">
+    <property name="geometry">
+     <rect>
+      <x>1190</x>
+      <y>90</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>ISP</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="objectdetection_label">
+    <property name="geometry">
+     <rect>
+      <x>1360</x>
+      <y>90</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Object Detection</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>280</y>
+      <width>1101</width>
+      <height>821</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reset_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>1120</y>
+      <width>1481</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset All</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="illuminant_reset">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="scene_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">text-align: center;</string>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Macbeth Chart</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Point Array</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Gridlines</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Slanted Edge</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rings Rays</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="optics_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">text-align: right;</string>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Example</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Cooke Triplet</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Double-Gauss</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FishEye</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>WideAngle</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="sensor_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-grbg</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-rggb</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-bggr</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-gbrg</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-ycmy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bayer-cyym</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MT9V024</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>AR0132AT</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IMX363</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IMX490-Large</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IMX490-Small</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Nikon-D100</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="isp_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>1150</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bilinear</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Adaptive Laplacian</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Laplacian</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Nearest Neighbor</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="objectdetection_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>DETR</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>YOLO</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="scene_reset">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="optics_reset">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sensor_reset">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="isp_reset">
+    <property name="geometry">
+     <rect>
+      <x>1150</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="objectdetection_reset">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="mode_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>30</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Mode</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="mode_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>171</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Design Optimization</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Failure Analysis</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="illuminant_parameters">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sensor_parameters">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="scene_parameters">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="isp_parameters">
+    <property name="geometry">
+     <rect>
+      <x>1150</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="optics_parameters">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="objectdetection_parameters">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="actuator_comboBox">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>130</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">text-align: right;</string>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="actuator_parameters">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>180</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Parameters</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="actuator_reset">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>230</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>굴림</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="actuator_label">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>90</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Actuator</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser">
+    <property name="geometry">
+     <rect>
+      <x>1170</x>
+      <y>280</y>
+      <width>361</width>
+      <height>821</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1562</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
