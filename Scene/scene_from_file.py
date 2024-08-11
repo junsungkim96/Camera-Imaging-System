@@ -1,8 +1,10 @@
+import os
 import numpy as np
 import scipy.io as sio
 import imageio
 from skimage import img_as_float
 from scipy.interpolate import interp1d
+
 
 import numpy as np
 from scipy.io import loadmat
@@ -32,15 +34,26 @@ def sceneFromFile(input_data: str | None = None,
         - image_type: 'spectral', 'rgb' or 'monochrome'
         - mean_luminance: If a value is sent in, set scene to this mean_luminance.
         - disp_cal: A display structure used to convert RGB to spectral data.
+                    For the typical case such as an emissive display, the illuminant SPD is modeled and set to the white point of the display
         - wave_list: The scene wavelength samples.
-        - illuminant_energy: Use this as the illuminant energy. It must have the same wavelength sampling as wList.
+        - illuminant_energy: Use this as the illuminant energy. It must have the same wavelength sampling as wave_list
         - scale_reflectance: Adjust the illuminant_energy level so that the maximum reflectance is 0.95. Default: True.
     
     Returns:
         - scene: scene structrue
+        
+    Description:
+        The data in the image file is converted into spectral format and placed as scene data structure. The allowable image types are
+        monochrome, rgb, multispectral and hyperspectral. If not specified and cannot be inferred, it might be asked. 
+        
+        If the image is in RGB format, a display calibration file(disp_cal) may be specified. This file contains display calibration data
+        that are used to convert the RGB values into a spectral radiance image. If disp_cal is not defined, the default display file 'lcdExample'
+        will be used. 
+        
+        The default illuminant for a RGB file is the display white point.  
     
     """
-    
+    ## Parameter Setup
     # Initialize scene as None
     scene = None
 
@@ -61,103 +74,110 @@ def sceneFromFile(input_data: str | None = None,
         elif file_ext in ['jpg', 'jpeg', 'png', 'tiff', 'bmp']:
             input_data = imageio.imread(input_data)
 
+    ## Determine the photons and illuminant structure
     # Determine the image type if not defined
     if image_type is None:
         raise ValueError("Image type is required")
     image_type = image_type.lower()
 
     # Handle different image types
-    if image_type in ['monochrome', 'rgb']:
-        # Initialize display structure if not provided
-        if disp_cal is None:
-            disp_cal = Display()
+    match image_type:
+        case 'monochrome' | 'rgb':
+            # Initialize display structure if not provided
+            if disp_cal is None:
+                disp_cal = Display()
 
-        # Load the display calibration file if it's a path
-        if isinstance(disp_cal, str):
-            theDisplay = Display(disp_cal)
-        elif isinstance(disp_cal, dict) and disp_cal.get('type') == 'display':
-            theDisplay = disp_cal
-        else:
-            raise ValueError("Bad display information.")
-
-        # Set the display wavelength if wList is provided
-        if wList is not None:
-            theDisplay['wave'] = wList
-        wave = theDisplay['wave']
-
-        # Get the scene spectral radiance using the display model
-        photons = vcReadImage(input_data, image_type, theDisplay)
-
-        # Initialize scene
-        # scene = sceneCreate('rgb')
-        scene = Scene('rgb')
-        # scene = sceneSet(scene, 'wave', wave)
-        scene.wave = wave
-
-        # Initialize the whole illuminant struct
-        if len(illuminant_energy) == 0:
-            if not theDisplay.is_emissive:
-                raise ValueError("Illuminant energy specification required for reflective display")
+            # Load the display calibration file if it's a path
+            if isinstance(disp_cal, str):
+                theDisplay = Display(disp_cal)
+            elif isinstance(disp_cal, dict) and disp_cal.type == 'display':
+                theDisplay = disp_cal
             else:
-                illuminant_energy = np.sum(theDisplay.spd, axis=1)
+                raise ValueError("Bad display information.")
 
-        il = Illuminant('D65', wave)
-        il.energy = illuminant_energy
+            # Set the display wavelength if wave_list is provided
+            if wave_list is not None:
+                theDisplay['wave'] = wave_list
+            wave = theDisplay['wave']
+            
+            do_sub = False
+            sz = None
 
-        # Compute photons for reflective display
-        if not displayGet(theDisplay, 'is emissive'):
-            il_photons = illuminantGet(il, 'photons', wave)
-            il_photons = il_photons.reshape(1, 1, len(wave))
-            photons = photons * il_photons
+            # Get the scene spectral radiance using the display model
+            photons = read_image_file(input_data, image_type, theDisplay, do_sub, sz)
 
-        # Set viewing distance and field of view
-        scene = sceneSet(scene, 'distance', displayGet(theDisplay, 'distance'))
-        imgSz = input_data.shape[1] if isinstance(input_data, np.ndarray) else input_data.get_shape()[1]
-        imgFov = imgSz * displayGet(theDisplay, 'deg per dot')
-        scene = sceneSet(scene, 'h fov', imgFov)
-        scene = sceneSet(scene, 'distance', displayGet(theDisplay, 'viewing distance'))
+            ## Initialize scene
+            # Match the display wavelength and the scene wavelength
+            scene = Scene('rgb')
+            scene.wave = wave
 
-    elif image_type in ['spectral', 'multispectral', 'hyperspectral']:
-        if not isinstance(input_data, str):
-            raise ValueError("Name of existing file required for multispectral")
-        if wList is None:
-            wList = []
+            # This code handles both emissive and reflective displays. The white point is set a little differently.
+            # (a) For emissive display, set the illuminant SPD to the white point of the display if ambient
+            #     lighiting is not set.
+            # (b) For reflective display, the illuminant is required and should be passed in as *args
 
-        scene = sceneCreate('multispectral')
+            # Initialize the whole illuminant struct
+            if len(illuminant_energy) == 0:
+                if not theDisplay.is_emissive:
+                    raise ValueError("Illuminant energy specification required for reflective display")
+                else:
+                    illuminant_energy = np.sum(theDisplay.spd, axis=1)
 
-        # Read image and illuminant structure
-        photons, il, basis = vcReadImage(input_data, image_type, wList)
+            il = Illuminant('D65', wave)
+            il.energy = illuminant_energy
 
-        # Override the default spectrum with the basis function wavelength sampling
-        scene = sceneSet(scene, 'wave', basis['wave'])
+            # Compute photons for reflective display
+            # For reflective display, until this step, the photon variable stores reflectance information
+            if theDisplay.is_emissive:
+                il_photons = il.photons
+                il_photons = il_photons.reshape(1, 1, len(wave))
+                photons = photons * il_photons
 
-        if isinstance(input_data, str) and 'name' in sio.whosmat(input_data):
-            mat_contents = sio.loadmat(input_data)
-            scene = sceneSet(scene, 'name', mat_contents['name'])
+            # Set viewing distance and field of view
+            scene.distance = theDisplay.distance
+            img_size = photons.shape[1]
+            img_fov = img_size * theDisplay.deg_per_dot
+            scene.wangular = img_fov
+            scene.distance = theDisplay.viewing_distance
+            
+        case 'spectral' | 'multispectral' | 'hyperspectral':
+            if not isinstance(input_data, str):
+                raise ValueError("Name of existing file required for multispectral")
+            if wave_list is None:
+                wave_list = []
 
-    else:
-        raise ValueError("Unknown image type")
+            scene = Scene('multispectral')
 
-    # Finalize the scene
+            # Read image and illuminant structure
+            photons, il, basis = read_image_file(input_data, image_type, wave_list)
+
+            # Override the default spectrum with the basis function wavelength sampling
+            scene.wavelength = basis.wave
+
+            if isinstance(input_data, str) and 'name' in sio.whosmat(input_data):
+                mat_contents = sio.loadmat(input_data)
+                scene.name = mat_contents['name']
+
+        case _:
+            raise ValueError("Unknown image type")
+
+    ## Put the remaining parameters in place and return
+    
     if isinstance(input_data, str):
-        # scene = sceneSet(scene, 'filename', input_data)
         scene.filename = input_data
     else:
-        scene = sceneSet(scene, 'filename', 'numerical')
         scene.filename = 'numerical'
-
 
     scene.photons = photons
     scene.illuminant = il
-    # scene = sceneSet(scene, 'photons', photons)
-    # scene = sceneSet(scene, 'illuminant', il)
 
+    # Name the scene with the filename or just announce that we received rgb data.
+    # Also check whether the file contains 'fov' and 'dist' variables, adjust the scene, override the data.
     if isinstance(input_data, str):
         n = input_data.split('/')[-1].split('.')[0]
         if input_data.endswith('.mat'):
             mat_contents = sio.loadmat(input_data)
             if 'fov' in mat_contents:
-                # scene = sceneSet(scene, 'fov', mat_contents['fov'])
                 scene.fov = mat_contents['fov']
             if 'dist' in mat_contents:
                 # scene = sceneSet(scene, 'distance', mat_contents['dist'])
@@ -171,16 +191,15 @@ def sceneFromFile(input_data: str | None = None,
 
     if mean_luminance is not None:
         scene = scene.adjust_luminance(mean_luminance)
-        # scene = sceneAdjustLuminance(scene, mean_luminance)
 
+    # Adjust illuminant level to a max reflectance 0.95.
+    # If the reflectances are expected to be dark, set to 'False'
     if scale_reflectance:
-        # r = sceneGet(scene, 'reflectance')
         r = scene.reflectance
-        maxR = np.max(r)
-        if maxR > 0.95:
-            # illuminant_energy = sceneGet(scene, 'illuminant energy')
-            # scene = sceneSet(scene, 'illuminant energy', illuminant_energy * maxR)
-            scene.illuminantenergy *= maxR
+        max_reflectance = np.max(r)
+        if max_reflectance > 0.95:
+            illuminant_energy =scene.illuminant_energy
+            scene.illuminantenergy = illuminant_energy * max_reflectance
 
     return scene
 
@@ -260,7 +279,7 @@ def read_image_file(fullname, image_type = 'rgb', *args):
                 spd = the_display['spd']
                 xw_img = in_img.rehspae((-1, in_img.shape[2]))
                 
-                if xw_img.size < 1e-6  # Use threshold as needed
+                if xw_img.size < 1e-6:  # Use threshold as needed
                     photons = energy_to_quanta(wave, xw_img * spd.T)
                 else:
                     photons = np.zeros((xw_img.shape[0], len(wave)))
@@ -363,7 +382,6 @@ def image_linear_transform(image, transform):
     return image_transform
     
         
-
 def find_wave_index(wave, wave_val, perfect = True):
     """
     Returns a boolean array of indices such that wave[idx] matches wave_val entry
@@ -401,3 +419,46 @@ def find_wave_index(wave, wave_val, perfect = True):
             print('Warning: Problems matching wavelengths. Could be out of range')
     
     return idx
+
+
+def lut_digital(DAC, g_table = None):
+    """
+    Convert DAC values to linear RGB intensities through a gamma table
+    
+    The DAC values are digital values with a bit detph that is determined by the device. 
+    We assume that the smallest DAC value is 0 and the largest value is 2 ^ (n_bits) -1.
+    
+    A g_table normally has size 2 ^ (n_bits) * 3, a table for each channel
+    If size is 2 ^ (n_bits) * 1, we assume three channels are the same. 
+    
+    If the g_table is a single number, we raise the data to the power g_table.
+    
+    The g_table is normally stored in the display calibration files. 
+    
+    For this routine, the returned RGB values are in the range of [0, 1].
+    They are linear with respect to radiance(intensity) of the display primaries. 
+    """
+    
+    if g_table is None:
+        g_table = 2.2
+        
+    if len(g_table) == 1:
+        RGB = DAC ** g_table
+        return RGB
+    
+    if np.max(DAC) > g_table.shape[0]:
+        raise ValueError(f'Max DAC value {np.max(DAC)} exceeds the row dimension {g_table.shape[0]} of the g_table')
+    
+    if np.max(g_table) > 1 or np.min(g_table) < 0:
+        raise ValueError(f'g_table entries should be between 0 and 1.')
+    
+    # Convert through the table
+    RGB = np.zeros(DAC.shape)
+    g_table = np.repeat(g_table[:, np.newaxis], DAC.shape[2], axis = 1)
+    
+    for i in range(DAC.shape[2]):
+        this_table = g_table[:, i]
+        RGB[:, :, i] = this_table[DAC[:, :, i]]
+        
+    return RGB
+
