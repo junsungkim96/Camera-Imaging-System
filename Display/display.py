@@ -8,8 +8,9 @@ from dataclasses import dataclass
 from color import color_block_matrix
 import cv2
 from scipy.ndimage import zoom
+from PIL import Image
 
-
+from Utils.utils import unit_conversion
 
 @dataclass
 class Dixel:
@@ -22,23 +23,23 @@ class Display():
     Create a display object.
 
 
-    Display(d) calibration data are stored in a display instance.
-    these are the spectral radiance distribution of its primaries and a gamma function.
+    Display calibration data are stored in a display instance.
+    These are the spectral radiance distribution of its primaries and a gamma function.
 
     Args:
-        display_name(str): Name of a file containing a calibrated display structure.
-        the supported display files are stored in data/display.
-        the files should contain a variable('d') as display structure.
+        - display_name(str): Name of a file containing a calibrated display structure.
+                             The supported display files are stored in data/display.
+                             The files should contain a variable('d') as display structure.
 
-        *kwargs: (Optional) User defined parameter values, should be in dictionary format.
-        See the optional key/value pairs section.
+        - **kwargs (Optional): User defined parameter values, should be in dictionary format.
+                              See the optional key/value pairs section.
 
     Attributes:
-        name: Name of the display file
+        - name: Name of the display file
 
 
     Properties:
-        whitespd(np.ndarray): White point spectral power distribution
+        - whitespd(np.ndarray): White point spectral power distribution
         
     Examples:
         >>> Display()
@@ -46,7 +47,6 @@ class Display():
         >>> Display('LCD-Apple.mat',)
         Display(name(LCD-Apple.mat), wave([380, 3... dtype=uint16), dpi(96), dist(0.5)...)
     """
-
     def __init__(self,
                  display_name: str = 'LCD-Apple.mat',
                  wave: np.ndarray | None = None,
@@ -57,32 +57,19 @@ class Display():
                  is_emissive: bool | None = None,
                  **kwargs):
 
+        # Set initial parameters
         self.name = display_name
 
         self.image = None  # we will set it later
 
         match self.name:
             case 'default':
-                # TODO: We will implement this later
-                """
-                Create a default display that works well with the imageSPD rendering routine.
-                    See vcReadImage for more notes.
-                """
-                self.wave = np.arange(400, 701, 10)
-                # Matlab `spd = pinv(colorBlockMatrix(length(wave))) / 700;`
-                self.spd = np.linalg.pinv(color_block_matrix(self.wave)) / 700
-                N = 256
-                g = np.tile(np.linspace(0, 1, N), (3, 1)).T
-                self.gamma = g
-                self.dpi = 96  # typical display density
-                self.dist = 0.5  # typical viewing distance
-                raise NotImplementedError('Default display is not implemented yet')
-
+                self.create_default()
+                
             case 'equalenergy' | 'equal energy':
-                raise NotImplementedError('Equal energy display is not implemented yet')
-                # self.default_display()
-                # spd = np.ones(self.spd.shape) * 1e-3
-                # self.spd = spd
+                self.create_default()
+                spd = np.ones(self.spd.shape) * 1e-3
+                self.spd = spd
 
             case _:
                 base_dir = Path(__file__).parent.parent / 'data/displays'
@@ -102,20 +89,15 @@ class Display():
 
         self.whitespd = np.sum(self.spd, axis=1, keepdims=True)
 
-    @property
-    def n_primaries(self):
-        return self.spd.shape[-1]
-
-    @property
-    def meter_per_dot(self):
-        dpi = self.dpi
-        dist = self.dist
-        val = np.atan()
-
-    @property
-    def over_sample(self):
+    def create_default(self):
+        self.wave = np.arange(400, 701, 10)
+        self.spd = np.linalg.pinv(color_block_matrix(self.wave)) / 700
+        N = 256
+        g = np.tile(np.linsapce(0, 1, N), (3, 1)).T
+        self.gamma = g
+        self.dpi = 96  # typical display density
+        self.dist = 0.5  # typical viewing idstance, 19 inches
         
-
 
     def __repr__(self) -> str:
         components = reprlib.repr(self.wave)
@@ -186,7 +168,66 @@ class Display():
         
         return out_image
         
+    @property
+    def n_primaries(self):
+        return self.spd.shape[-1]
+
+    def get_meters_per_dot(self, units):
+        dpi = self.dpi
+        ipm = 1 / 0.0254
+        dpm = dpi * ipm
+        val = 1 / dpm
         
+        if units:
+            val *= unit_conversion(units)
+        
+        return val
+        
+        
+    def get_dots_per_meter(self, units):
+        mpd = self.get_meters_per_dot(units)
+        val = 1 / mpd
+        
+        if units:
+            val *= unit_conversion(units)
+            
+        return val
+
+    @property
+    def over_sample(self):
+        sz = self.dixel.size
+        val = sz / self.pixels_per_dixel
+        
+        return val
+    
+    @property
+    def pixels_per_dixel(self):
+        if self.dixel.n_pixels: 
+            val = self.dixel.n_pixels
+        else:
+            dixel_control = self.get_dixel_control_map()
+            val = np.max(dixel_control)
+        
+        return val
+
+    def get_dixel_control_map(self, *args):
+        dixel = self.dixel
+        if dixel is None:
+            raise ValueError('Dixel structure does not exist')
+        if dixel.control_map:
+            val = dixel.control_map
+            
+        # Adjust the size of the control map if required
+        if args:
+            sz = args[0]
+            if len(sz) == 1:
+                sz = [sz, sz]
+                
+            val = val.resize(sz, Image.NEAREST)
+        
+        val = np.array(val)
+        
+        return val
 
 if __name__ == '__main__':
     display_cal_file = 'LCD-Apple.mat'
